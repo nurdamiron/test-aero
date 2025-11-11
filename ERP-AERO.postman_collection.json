@@ -1,0 +1,2743 @@
+{
+	"info": {
+		"name": "ERP.AERO API - Complete Test Suite",
+		"description": "Complete API collection for ERP.AERO with JWT authentication, file management, and comprehensive testing",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "1. Health Check",
+			"item": [
+				{
+					"name": "Health Check",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"console.log('');",
+									"console.log('-'.repeat(60));",
+									"console.log('REQUEST: REQUEST:', pm.info.requestName);",
+									"console.log('-'.repeat(60));",
+									"console.log('Method:', pm.request.method);",
+									"console.log('URL:', pm.request.url.toString());",
+									"",
+									"// Log headers (exclude Authorization token for security)",
+									"const headers = pm.request.headers.toObject();",
+									"if (headers.Authorization) {",
+									"    headers.Authorization = 'Bearer [HIDDEN]';",
+									"}",
+									"console.log('Headers:', JSON.stringify(headers, null, 2));",
+									"",
+									"// Log request body if exists",
+									"if (pm.request.body && pm.request.body.mode === 'raw') {",
+									"    try {",
+									"        const body = JSON.parse(pm.request.body.raw);",
+									"        if (body.password) body.password = '[HIDDEN]';",
+									"        if (body.refreshToken) body.refreshToken = '[HIDDEN]';",
+									"        console.log('Body:', JSON.stringify(body, null, 2));",
+									"    } catch (e) {",
+									"        console.log('Body:', pm.request.body.raw);",
+									"    }",
+									"} else if (pm.request.body && pm.request.body.mode === 'formdata') {",
+									"    console.log('Body: [FormData with file]');",
+									"}",
+									"",
+									"console.log('');",
+									"console.log('RESPONSE: RESPONSE:');",
+									"console.log('Status:', pm.response.code, pm.response.status);",
+									"",
+									"// Log response body",
+									"try {",
+									"    const responseData = pm.response.json();",
+									"    // Hide sensitive data",
+									"    if (responseData.accessToken) responseData.accessToken = responseData.accessToken.substring(0, 20) + '...[HIDDEN]';",
+									"    if (responseData.refreshToken) responseData.refreshToken = responseData.refreshToken.substring(0, 20) + '...[HIDDEN]';",
+									"    console.log('Response Body:', JSON.stringify(responseData, null, 2));",
+									"} catch (e) {",
+									"    const text = pm.response.text();",
+									"    if (text.length > 200) {",
+									"        console.log('Response Body: [Binary or large content,', text.length, 'bytes]');",
+									"    } else {",
+									"        console.log('Response Body:', text);",
+									"    }",
+									"}",
+									"console.log('-'.repeat(60));",
+									"console.log('');",
+									"",
+									"pm.test('Status code is 200', () => {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test('API is healthy', () => {",
+									"    const jsonData = pm.response.json();",
+									"    pm.expect(jsonData.status).to.eql('ok');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/health",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"health"
+							]
+						},
+						"description": "Check API health and database connectivity"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "2. Authentication Flow",
+			"item": [
+				{
+					"name": "1. Register New User",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"console.log('');",
+									"console.log('-'.repeat(60));",
+									"console.log('REQUEST: REQUEST:', pm.info.requestName);",
+									"console.log('-'.repeat(60));",
+									"console.log('Method:', pm.request.method);",
+									"console.log('URL:', pm.request.url.toString());",
+									"",
+									"// Log headers (exclude Authorization token for security)",
+									"const headers = pm.request.headers.toObject();",
+									"if (headers.Authorization) {",
+									"    headers.Authorization = 'Bearer [HIDDEN]';",
+									"}",
+									"console.log('Headers:', JSON.stringify(headers, null, 2));",
+									"",
+									"// Log request body if exists",
+									"if (pm.request.body && pm.request.body.mode === 'raw') {",
+									"    try {",
+									"        const body = JSON.parse(pm.request.body.raw);",
+									"        if (body.password) body.password = '[HIDDEN]';",
+									"        if (body.refreshToken) body.refreshToken = '[HIDDEN]';",
+									"        console.log('Body:', JSON.stringify(body, null, 2));",
+									"    } catch (e) {",
+									"        console.log('Body:', pm.request.body.raw);",
+									"    }",
+									"} else if (pm.request.body && pm.request.body.mode === 'formdata') {",
+									"    console.log('Body: [FormData with file]');",
+									"}",
+									"",
+									"console.log('');",
+									"console.log('RESPONSE: RESPONSE:');",
+									"console.log('Status:', pm.response.code, pm.response.status);",
+									"",
+									"// Log response body",
+									"try {",
+									"    const responseData = pm.response.json();",
+									"    // Hide sensitive data",
+									"    if (responseData.accessToken) responseData.accessToken = responseData.accessToken.substring(0, 20) + '...[HIDDEN]';",
+									"    if (responseData.refreshToken) responseData.refreshToken = responseData.refreshToken.substring(0, 20) + '...[HIDDEN]';",
+									"    console.log('Response Body:', JSON.stringify(responseData, null, 2));",
+									"} catch (e) {",
+									"    const text = pm.response.text();",
+									"    if (text.length > 200) {",
+									"        console.log('Response Body: [Binary or large content,', text.length, 'bytes]');",
+									"    } else {",
+									"        console.log('Response Body:', text);",
+									"    }",
+									"}",
+									"console.log('-'.repeat(60));",
+									"console.log('');",
+									"",
+									"if (pm.response.code === 201) {",
+									"    pm.test('Status code is 201', () => {",
+									"        pm.response.to.have.status(201);",
+									"    });",
+									"    ",
+									"    const jsonData = pm.response.json();",
+									"    ",
+									"    pm.test('Response has accessToken', () => {",
+									"        pm.expect(jsonData.accessToken).to.be.a('string');",
+									"        pm.expect(jsonData.accessToken.length).to.be.above(0);",
+									"    });",
+									"    ",
+									"    pm.test('Response has refreshToken', () => {",
+									"        pm.expect(jsonData.refreshToken).to.be.a('string');",
+									"        pm.expect(jsonData.refreshToken.length).to.be.above(0);",
+									"    });",
+									"    ",
+									"    pm.test('Token expiry is 10m', () => {",
+									"        pm.expect(jsonData.accessTokenExpiry).to.eql('10m');",
+									"    });",
+									"    ",
+									"    // Save tokens",
+									"    pm.environment.set('accessToken', jsonData.accessToken);",
+									"    pm.environment.set('refreshToken', jsonData.refreshToken);",
+									"} else if (pm.response.code === 409) {",
+									"    pm.test('User already exists (expected)', () => {",
+									"        pm.response.to.have.status(409);",
+									"    });",
+									"    console.log('User already registered, will use login instead');",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"id\": \"test@erp.aero\",\n  \"password\": \"SecurePass123\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/signup",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"signup"
+							]
+						},
+						"description": "Register a new user. ID can be email or phone number (+79991234567)"
+					},
+					"response": []
+				},
+				{
+					"name": "2. Login Existing User",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"console.log('');",
+									"console.log('-'.repeat(60));",
+									"console.log('REQUEST: REQUEST:', pm.info.requestName);",
+									"console.log('-'.repeat(60));",
+									"console.log('Method:', pm.request.method);",
+									"console.log('URL:', pm.request.url.toString());",
+									"",
+									"// Log headers (exclude Authorization token for security)",
+									"const headers = pm.request.headers.toObject();",
+									"if (headers.Authorization) {",
+									"    headers.Authorization = 'Bearer [HIDDEN]';",
+									"}",
+									"console.log('Headers:', JSON.stringify(headers, null, 2));",
+									"",
+									"// Log request body if exists",
+									"if (pm.request.body && pm.request.body.mode === 'raw') {",
+									"    try {",
+									"        const body = JSON.parse(pm.request.body.raw);",
+									"        if (body.password) body.password = '[HIDDEN]';",
+									"        if (body.refreshToken) body.refreshToken = '[HIDDEN]';",
+									"        console.log('Body:', JSON.stringify(body, null, 2));",
+									"    } catch (e) {",
+									"        console.log('Body:', pm.request.body.raw);",
+									"    }",
+									"} else if (pm.request.body && pm.request.body.mode === 'formdata') {",
+									"    console.log('Body: [FormData with file]');",
+									"}",
+									"",
+									"console.log('');",
+									"console.log('RESPONSE: RESPONSE:');",
+									"console.log('Status:', pm.response.code, pm.response.status);",
+									"",
+									"// Log response body",
+									"try {",
+									"    const responseData = pm.response.json();",
+									"    // Hide sensitive data",
+									"    if (responseData.accessToken) responseData.accessToken = responseData.accessToken.substring(0, 20) + '...[HIDDEN]';",
+									"    if (responseData.refreshToken) responseData.refreshToken = responseData.refreshToken.substring(0, 20) + '...[HIDDEN]';",
+									"    console.log('Response Body:', JSON.stringify(responseData, null, 2));",
+									"} catch (e) {",
+									"    const text = pm.response.text();",
+									"    if (text.length > 200) {",
+									"        console.log('Response Body: [Binary or large content,', text.length, 'bytes]');",
+									"    } else {",
+									"        console.log('Response Body:', text);",
+									"    }",
+									"}",
+									"console.log('-'.repeat(60));",
+									"console.log('');",
+									"",
+									"pm.test('Status code is 200', () => {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"const jsonData = pm.response.json();",
+									"",
+									"pm.test('Response has accessToken', () => {",
+									"    pm.expect(jsonData.accessToken).to.be.a('string');",
+									"    pm.expect(jsonData.accessToken.length).to.be.above(0);",
+									"});",
+									"",
+									"pm.test('Response has refreshToken', () => {",
+									"    pm.expect(jsonData.refreshToken).to.be.a('string');",
+									"    pm.expect(jsonData.refreshToken.length).to.be.above(0);",
+									"});",
+									"",
+									"pm.test('Token expiry is 10m', () => {",
+									"    pm.expect(jsonData.accessTokenExpiry).to.eql('10m');",
+									"});",
+									"",
+									"// Save tokens",
+									"pm.environment.set('accessToken', jsonData.accessToken);",
+									"pm.environment.set('refreshToken', jsonData.refreshToken);",
+									"",
+									"console.log(' Login successful, tokens saved');"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"id\": \"test@erp.aero\",\n  \"password\": \"SecurePass123\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/signin",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"signin"
+							]
+						},
+						"description": "Login with existing user. Rate limited: 5 attempts per 15 minutes."
+					},
+					"response": []
+				},
+				{
+					"name": "3. Get User Info",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"console.log('');",
+									"console.log('-'.repeat(60));",
+									"console.log('REQUEST: REQUEST:', pm.info.requestName);",
+									"console.log('-'.repeat(60));",
+									"console.log('Method:', pm.request.method);",
+									"console.log('URL:', pm.request.url.toString());",
+									"",
+									"// Log headers (exclude Authorization token for security)",
+									"const headers = pm.request.headers.toObject();",
+									"if (headers.Authorization) {",
+									"    headers.Authorization = 'Bearer [HIDDEN]';",
+									"}",
+									"console.log('Headers:', JSON.stringify(headers, null, 2));",
+									"",
+									"// Log request body if exists",
+									"if (pm.request.body && pm.request.body.mode === 'raw') {",
+									"    try {",
+									"        const body = JSON.parse(pm.request.body.raw);",
+									"        if (body.password) body.password = '[HIDDEN]';",
+									"        if (body.refreshToken) body.refreshToken = '[HIDDEN]';",
+									"        console.log('Body:', JSON.stringify(body, null, 2));",
+									"    } catch (e) {",
+									"        console.log('Body:', pm.request.body.raw);",
+									"    }",
+									"} else if (pm.request.body && pm.request.body.mode === 'formdata') {",
+									"    console.log('Body: [FormData with file]');",
+									"}",
+									"",
+									"console.log('');",
+									"console.log('RESPONSE: RESPONSE:');",
+									"console.log('Status:', pm.response.code, pm.response.status);",
+									"",
+									"// Log response body",
+									"try {",
+									"    const responseData = pm.response.json();",
+									"    // Hide sensitive data",
+									"    if (responseData.accessToken) responseData.accessToken = responseData.accessToken.substring(0, 20) + '...[HIDDEN]';",
+									"    if (responseData.refreshToken) responseData.refreshToken = responseData.refreshToken.substring(0, 20) + '...[HIDDEN]';",
+									"    console.log('Response Body:', JSON.stringify(responseData, null, 2));",
+									"} catch (e) {",
+									"    const text = pm.response.text();",
+									"    if (text.length > 200) {",
+									"        console.log('Response Body: [Binary or large content,', text.length, 'bytes]');",
+									"    } else {",
+									"        console.log('Response Body:', text);",
+									"    }",
+									"}",
+									"console.log('-'.repeat(60));",
+									"console.log('');",
+									"",
+									"pm.test('Status code is 200', () => {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"const jsonData = pm.response.json();",
+									"",
+									"pm.test('Response has user id', () => {",
+									"    pm.expect(jsonData.id).to.be.a('string');",
+									"    pm.expect(jsonData.id).to.eql('test@erp.aero');",
+									"});",
+									"",
+									"console.log(' User info retrieved successfully');"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/info",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"info"
+							]
+						},
+						"description": "Get user information"
+					},
+					"response": []
+				},
+				{
+					"name": "4. Refresh Access Token",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"console.log('');",
+									"console.log('-'.repeat(60));",
+									"console.log('REQUEST: REQUEST:', pm.info.requestName);",
+									"console.log('-'.repeat(60));",
+									"console.log('Method:', pm.request.method);",
+									"console.log('URL:', pm.request.url.toString());",
+									"",
+									"// Log headers (exclude Authorization token for security)",
+									"const headers = pm.request.headers.toObject();",
+									"if (headers.Authorization) {",
+									"    headers.Authorization = 'Bearer [HIDDEN]';",
+									"}",
+									"console.log('Headers:', JSON.stringify(headers, null, 2));",
+									"",
+									"// Log request body if exists",
+									"if (pm.request.body && pm.request.body.mode === 'raw') {",
+									"    try {",
+									"        const body = JSON.parse(pm.request.body.raw);",
+									"        if (body.password) body.password = '[HIDDEN]';",
+									"        if (body.refreshToken) body.refreshToken = '[HIDDEN]';",
+									"        console.log('Body:', JSON.stringify(body, null, 2));",
+									"    } catch (e) {",
+									"        console.log('Body:', pm.request.body.raw);",
+									"    }",
+									"} else if (pm.request.body && pm.request.body.mode === 'formdata') {",
+									"    console.log('Body: [FormData with file]');",
+									"}",
+									"",
+									"console.log('');",
+									"console.log('RESPONSE: RESPONSE:');",
+									"console.log('Status:', pm.response.code, pm.response.status);",
+									"",
+									"// Log response body",
+									"try {",
+									"    const responseData = pm.response.json();",
+									"    // Hide sensitive data",
+									"    if (responseData.accessToken) responseData.accessToken = responseData.accessToken.substring(0, 20) + '...[HIDDEN]';",
+									"    if (responseData.refreshToken) responseData.refreshToken = responseData.refreshToken.substring(0, 20) + '...[HIDDEN]';",
+									"    console.log('Response Body:', JSON.stringify(responseData, null, 2));",
+									"} catch (e) {",
+									"    const text = pm.response.text();",
+									"    if (text.length > 200) {",
+									"        console.log('Response Body: [Binary or large content,', text.length, 'bytes]');",
+									"    } else {",
+									"        console.log('Response Body:', text);",
+									"    }",
+									"}",
+									"console.log('-'.repeat(60));",
+									"console.log('');",
+									"",
+									"pm.test('Status code is 200', () => {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"const jsonData = pm.response.json();",
+									"",
+									"pm.test('Response has new accessToken', () => {",
+									"    pm.expect(jsonData.accessToken).to.be.a('string');",
+									"    pm.expect(jsonData.accessToken.length).to.be.above(0);",
+									"});",
+									"",
+									"pm.test('Response has new refreshToken', () => {",
+									"    pm.expect(jsonData.refreshToken).to.be.a('string');",
+									"    pm.expect(jsonData.refreshToken.length).to.be.above(0);",
+									"});",
+									"",
+									"// Save new tokens",
+									"pm.environment.set('accessToken', jsonData.accessToken);",
+									"pm.environment.set('refreshToken', jsonData.refreshToken);",
+									"",
+									"console.log(' Tokens refreshed successfully');"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"refreshToken\": \"{{refreshToken}}\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/signin/new_token",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"signin",
+								"new_token"
+							]
+						},
+						"description": "Get new access + refresh tokens. Old refresh token is invalidated (rotation)."
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "3. File Management Flow",
+			"item": [
+				{
+					"name": "1. Upload File (sample.txt)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"console.log('');",
+									"console.log('-'.repeat(60));",
+									"console.log('REQUEST: REQUEST:', pm.info.requestName);",
+									"console.log('-'.repeat(60));",
+									"console.log('Method:', pm.request.method);",
+									"console.log('URL:', pm.request.url.toString());",
+									"",
+									"// Log headers (exclude Authorization token for security)",
+									"const headers = pm.request.headers.toObject();",
+									"if (headers.Authorization) {",
+									"    headers.Authorization = 'Bearer [HIDDEN]';",
+									"}",
+									"console.log('Headers:', JSON.stringify(headers, null, 2));",
+									"",
+									"// Log request body if exists",
+									"if (pm.request.body && pm.request.body.mode === 'raw') {",
+									"    try {",
+									"        const body = JSON.parse(pm.request.body.raw);",
+									"        if (body.password) body.password = '[HIDDEN]';",
+									"        if (body.refreshToken) body.refreshToken = '[HIDDEN]';",
+									"        console.log('Body:', JSON.stringify(body, null, 2));",
+									"    } catch (e) {",
+									"        console.log('Body:', pm.request.body.raw);",
+									"    }",
+									"} else if (pm.request.body && pm.request.body.mode === 'formdata') {",
+									"    console.log('Body: [FormData with file]');",
+									"}",
+									"",
+									"console.log('');",
+									"console.log('RESPONSE: RESPONSE:');",
+									"console.log('Status:', pm.response.code, pm.response.status);",
+									"",
+									"// Log response body",
+									"try {",
+									"    const responseData = pm.response.json();",
+									"    // Hide sensitive data",
+									"    if (responseData.accessToken) responseData.accessToken = responseData.accessToken.substring(0, 20) + '...[HIDDEN]';",
+									"    if (responseData.refreshToken) responseData.refreshToken = responseData.refreshToken.substring(0, 20) + '...[HIDDEN]';",
+									"    console.log('Response Body:', JSON.stringify(responseData, null, 2));",
+									"} catch (e) {",
+									"    const text = pm.response.text();",
+									"    if (text.length > 200) {",
+									"        console.log('Response Body: [Binary or large content,', text.length, 'bytes]');",
+									"    } else {",
+									"        console.log('Response Body:', text);",
+									"    }",
+									"}",
+									"console.log('-'.repeat(60));",
+									"console.log('');",
+									"",
+									"pm.test('Status code is 201', () => {",
+									"    pm.response.to.have.status(201);",
+									"});",
+									"",
+									"const jsonData = pm.response.json();",
+									"",
+									"pm.test('Response has fileId', () => {",
+									"    pm.expect(jsonData.fileId).to.be.a('number');",
+									"    pm.expect(jsonData.fileId).to.be.above(0);",
+									"});",
+									"",
+									"pm.test('Response has filename', () => {",
+									"    pm.expect(jsonData.filename).to.be.a('string');",
+									"});",
+									"",
+									"pm.test('Response has extension', () => {",
+									"    pm.expect(jsonData.extension).to.eql('txt');",
+									"});",
+									"",
+									"pm.test('Response has mimeType', () => {",
+									"    pm.expect(jsonData.mimeType).to.be.a('string');",
+									"});",
+									"",
+									"pm.test('Response has size', () => {",
+									"    pm.expect(jsonData.size).to.be.a('number');",
+									"    pm.expect(jsonData.size).to.be.above(0);",
+									"});",
+									"",
+									"pm.test('Response has uploadDate', () => {",
+									"    pm.expect(jsonData.uploadDate).to.be.a('string');",
+									"});",
+									"",
+									"// Save fileId for next requests",
+									"pm.environment.set('fileId', jsonData.fileId);",
+									"",
+									"console.log(' File uploaded successfully, fileId:', jsonData.fileId);"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "file",
+									"type": "file",
+									"src": "test-data/sample.txt"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{baseUrl}}/file/upload",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"file",
+								"upload"
+							]
+						},
+						"description": "Upload a file. Max size: 10MB. Rate limit: 10 uploads/minute."
+					},
+					"response": []
+				},
+				{
+					"name": "2. Get File Info",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"console.log('');",
+									"console.log('-'.repeat(60));",
+									"console.log('REQUEST: REQUEST:', pm.info.requestName);",
+									"console.log('-'.repeat(60));",
+									"console.log('Method:', pm.request.method);",
+									"console.log('URL:', pm.request.url.toString());",
+									"",
+									"// Log headers (exclude Authorization token for security)",
+									"const headers = pm.request.headers.toObject();",
+									"if (headers.Authorization) {",
+									"    headers.Authorization = 'Bearer [HIDDEN]';",
+									"}",
+									"console.log('Headers:', JSON.stringify(headers, null, 2));",
+									"",
+									"// Log request body if exists",
+									"if (pm.request.body && pm.request.body.mode === 'raw') {",
+									"    try {",
+									"        const body = JSON.parse(pm.request.body.raw);",
+									"        if (body.password) body.password = '[HIDDEN]';",
+									"        if (body.refreshToken) body.refreshToken = '[HIDDEN]';",
+									"        console.log('Body:', JSON.stringify(body, null, 2));",
+									"    } catch (e) {",
+									"        console.log('Body:', pm.request.body.raw);",
+									"    }",
+									"} else if (pm.request.body && pm.request.body.mode === 'formdata') {",
+									"    console.log('Body: [FormData with file]');",
+									"}",
+									"",
+									"console.log('');",
+									"console.log('RESPONSE: RESPONSE:');",
+									"console.log('Status:', pm.response.code, pm.response.status);",
+									"",
+									"// Log response body",
+									"try {",
+									"    const responseData = pm.response.json();",
+									"    // Hide sensitive data",
+									"    if (responseData.accessToken) responseData.accessToken = responseData.accessToken.substring(0, 20) + '...[HIDDEN]';",
+									"    if (responseData.refreshToken) responseData.refreshToken = responseData.refreshToken.substring(0, 20) + '...[HIDDEN]';",
+									"    console.log('Response Body:', JSON.stringify(responseData, null, 2));",
+									"} catch (e) {",
+									"    const text = pm.response.text();",
+									"    if (text.length > 200) {",
+									"        console.log('Response Body: [Binary or large content,', text.length, 'bytes]');",
+									"    } else {",
+									"        console.log('Response Body:', text);",
+									"    }",
+									"}",
+									"console.log('-'.repeat(60));",
+									"console.log('');",
+									"",
+									"pm.test('Status code is 200', () => {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"const jsonData = pm.response.json();",
+									"",
+									"pm.test('Response has correct fileId', () => {",
+									"    pm.expect(jsonData.fileId).to.eql(parseInt(pm.environment.get('fileId')));",
+									"});",
+									"",
+									"pm.test('Response has filename', () => {",
+									"    pm.expect(jsonData.filename).to.be.a('string');",
+									"});",
+									"",
+									"pm.test('Response has extension', () => {",
+									"    pm.expect(jsonData.extension).to.eql('txt');",
+									"});",
+									"",
+									"console.log(' File info retrieved successfully');"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/file/{{fileId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"file",
+								"{{fileId}}"
+							]
+						},
+						"description": "Get file metadata by ID"
+					},
+					"response": []
+				},
+				{
+					"name": "3. List Files",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"console.log('');",
+									"console.log('-'.repeat(60));",
+									"console.log('REQUEST: REQUEST:', pm.info.requestName);",
+									"console.log('-'.repeat(60));",
+									"console.log('Method:', pm.request.method);",
+									"console.log('URL:', pm.request.url.toString());",
+									"",
+									"// Log headers (exclude Authorization token for security)",
+									"const headers = pm.request.headers.toObject();",
+									"if (headers.Authorization) {",
+									"    headers.Authorization = 'Bearer [HIDDEN]';",
+									"}",
+									"console.log('Headers:', JSON.stringify(headers, null, 2));",
+									"",
+									"// Log request body if exists",
+									"if (pm.request.body && pm.request.body.mode === 'raw') {",
+									"    try {",
+									"        const body = JSON.parse(pm.request.body.raw);",
+									"        if (body.password) body.password = '[HIDDEN]';",
+									"        if (body.refreshToken) body.refreshToken = '[HIDDEN]';",
+									"        console.log('Body:', JSON.stringify(body, null, 2));",
+									"    } catch (e) {",
+									"        console.log('Body:', pm.request.body.raw);",
+									"    }",
+									"} else if (pm.request.body && pm.request.body.mode === 'formdata') {",
+									"    console.log('Body: [FormData with file]');",
+									"}",
+									"",
+									"console.log('');",
+									"console.log('RESPONSE: RESPONSE:');",
+									"console.log('Status:', pm.response.code, pm.response.status);",
+									"",
+									"// Log response body",
+									"try {",
+									"    const responseData = pm.response.json();",
+									"    // Hide sensitive data",
+									"    if (responseData.accessToken) responseData.accessToken = responseData.accessToken.substring(0, 20) + '...[HIDDEN]';",
+									"    if (responseData.refreshToken) responseData.refreshToken = responseData.refreshToken.substring(0, 20) + '...[HIDDEN]';",
+									"    console.log('Response Body:', JSON.stringify(responseData, null, 2));",
+									"} catch (e) {",
+									"    const text = pm.response.text();",
+									"    if (text.length > 200) {",
+									"        console.log('Response Body: [Binary or large content,', text.length, 'bytes]');",
+									"    } else {",
+									"        console.log('Response Body:', text);",
+									"    }",
+									"}",
+									"console.log('-'.repeat(60));",
+									"console.log('');",
+									"",
+									"pm.test('Status code is 200', () => {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"const jsonData = pm.response.json();",
+									"",
+									"pm.test('Response has files array', () => {",
+									"    pm.expect(jsonData.files).to.be.an('array');",
+									"    pm.expect(jsonData.files.length).to.be.above(0);",
+									"});",
+									"",
+									"pm.test('Response has pagination info', () => {",
+									"    pm.expect(jsonData.page).to.be.a('number');",
+									"    pm.expect(jsonData.totalPages).to.be.a('number');",
+									"    pm.expect(jsonData.totalFiles).to.be.a('number');",
+									"});",
+									"",
+									"pm.test('Uploaded file is in the list', () => {",
+									"    const fileId = parseInt(pm.environment.get('fileId'));",
+									"    const foundFile = jsonData.files.find(f => f.fileId === fileId);",
+									"    pm.expect(foundFile).to.not.be.undefined;",
+									"});",
+									"",
+									"console.log(' File list retrieved, total files:', jsonData.totalFiles);"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/file/list?page=1&list_size=10",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"file",
+								"list"
+							],
+							"query": [
+								{
+									"key": "page",
+									"value": "1",
+									"description": "Page number (default: 1)"
+								},
+								{
+									"key": "list_size",
+									"value": "10",
+									"description": "Items per page (default: 10, max: 100)"
+								}
+							]
+						},
+						"description": "Get paginated list of files"
+					},
+					"response": []
+				},
+				{
+					"name": "4. Download File",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"console.log('');",
+									"console.log('-'.repeat(60));",
+									"console.log('REQUEST: REQUEST:', pm.info.requestName);",
+									"console.log('-'.repeat(60));",
+									"console.log('Method:', pm.request.method);",
+									"console.log('URL:', pm.request.url.toString());",
+									"",
+									"// Log headers (exclude Authorization token for security)",
+									"const headers = pm.request.headers.toObject();",
+									"if (headers.Authorization) {",
+									"    headers.Authorization = 'Bearer [HIDDEN]';",
+									"}",
+									"console.log('Headers:', JSON.stringify(headers, null, 2));",
+									"",
+									"// Log request body if exists",
+									"if (pm.request.body && pm.request.body.mode === 'raw') {",
+									"    try {",
+									"        const body = JSON.parse(pm.request.body.raw);",
+									"        if (body.password) body.password = '[HIDDEN]';",
+									"        if (body.refreshToken) body.refreshToken = '[HIDDEN]';",
+									"        console.log('Body:', JSON.stringify(body, null, 2));",
+									"    } catch (e) {",
+									"        console.log('Body:', pm.request.body.raw);",
+									"    }",
+									"} else if (pm.request.body && pm.request.body.mode === 'formdata') {",
+									"    console.log('Body: [FormData with file]');",
+									"}",
+									"",
+									"console.log('');",
+									"console.log('RESPONSE: RESPONSE:');",
+									"console.log('Status:', pm.response.code, pm.response.status);",
+									"",
+									"// Log response body",
+									"try {",
+									"    const responseData = pm.response.json();",
+									"    // Hide sensitive data",
+									"    if (responseData.accessToken) responseData.accessToken = responseData.accessToken.substring(0, 20) + '...[HIDDEN]';",
+									"    if (responseData.refreshToken) responseData.refreshToken = responseData.refreshToken.substring(0, 20) + '...[HIDDEN]';",
+									"    console.log('Response Body:', JSON.stringify(responseData, null, 2));",
+									"} catch (e) {",
+									"    const text = pm.response.text();",
+									"    if (text.length > 200) {",
+									"        console.log('Response Body: [Binary or large content,', text.length, 'bytes]');",
+									"    } else {",
+									"        console.log('Response Body:', text);",
+									"    }",
+									"}",
+									"console.log('-'.repeat(60));",
+									"console.log('');",
+									"",
+									"pm.test('Status code is 200', () => {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test('Response has file content', () => {",
+									"    pm.expect(pm.response.text().length).to.be.above(0);",
+									"});",
+									"",
+									"pm.test('Content-Type header is present', () => {",
+									"    pm.expect(pm.response.headers.get('Content-Type')).to.exist;",
+									"});",
+									"",
+									"console.log(' File downloaded successfully');"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/file/download/{{fileId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"file",
+								"download",
+								"{{fileId}}"
+							]
+						},
+						"description": "Download file by ID"
+					},
+					"response": []
+				},
+				{
+					"name": "5. Update File",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"console.log('');",
+									"console.log('-'.repeat(60));",
+									"console.log('REQUEST: REQUEST:', pm.info.requestName);",
+									"console.log('-'.repeat(60));",
+									"console.log('Method:', pm.request.method);",
+									"console.log('URL:', pm.request.url.toString());",
+									"",
+									"// Log headers (exclude Authorization token for security)",
+									"const headers = pm.request.headers.toObject();",
+									"if (headers.Authorization) {",
+									"    headers.Authorization = 'Bearer [HIDDEN]';",
+									"}",
+									"console.log('Headers:', JSON.stringify(headers, null, 2));",
+									"",
+									"// Log request body if exists",
+									"if (pm.request.body && pm.request.body.mode === 'raw') {",
+									"    try {",
+									"        const body = JSON.parse(pm.request.body.raw);",
+									"        if (body.password) body.password = '[HIDDEN]';",
+									"        if (body.refreshToken) body.refreshToken = '[HIDDEN]';",
+									"        console.log('Body:', JSON.stringify(body, null, 2));",
+									"    } catch (e) {",
+									"        console.log('Body:', pm.request.body.raw);",
+									"    }",
+									"} else if (pm.request.body && pm.request.body.mode === 'formdata') {",
+									"    console.log('Body: [FormData with file]');",
+									"}",
+									"",
+									"console.log('');",
+									"console.log('RESPONSE: RESPONSE:');",
+									"console.log('Status:', pm.response.code, pm.response.status);",
+									"",
+									"// Log response body",
+									"try {",
+									"    const responseData = pm.response.json();",
+									"    // Hide sensitive data",
+									"    if (responseData.accessToken) responseData.accessToken = responseData.accessToken.substring(0, 20) + '...[HIDDEN]';",
+									"    if (responseData.refreshToken) responseData.refreshToken = responseData.refreshToken.substring(0, 20) + '...[HIDDEN]';",
+									"    console.log('Response Body:', JSON.stringify(responseData, null, 2));",
+									"} catch (e) {",
+									"    const text = pm.response.text();",
+									"    if (text.length > 200) {",
+									"        console.log('Response Body: [Binary or large content,', text.length, 'bytes]');",
+									"    } else {",
+									"        console.log('Response Body:', text);",
+									"    }",
+									"}",
+									"console.log('-'.repeat(60));",
+									"console.log('');",
+									"",
+									"pm.test('Status code is 200', () => {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"const jsonData = pm.response.json();",
+									"",
+									"pm.test('Response has correct fileId', () => {",
+									"    pm.expect(jsonData.fileId).to.eql(parseInt(pm.environment.get('fileId')));",
+									"});",
+									"",
+									"pm.test('Response has new size', () => {",
+									"    pm.expect(jsonData.size).to.be.a('number');",
+									"});",
+									"",
+									"pm.test('Response has new uploadDate', () => {",
+									"    pm.expect(jsonData.uploadDate).to.be.a('string');",
+									"});",
+									"",
+									"console.log(' File updated successfully');"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "file",
+									"type": "file",
+									"src": "test-data/update.txt"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{baseUrl}}/file/update/{{fileId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"file",
+								"update",
+								"{{fileId}}"
+							]
+						},
+						"description": "Replace existing file with new one"
+					},
+					"response": []
+				},
+				{
+					"name": "6. Delete File",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"console.log('');",
+									"console.log('-'.repeat(60));",
+									"console.log('REQUEST: REQUEST:', pm.info.requestName);",
+									"console.log('-'.repeat(60));",
+									"console.log('Method:', pm.request.method);",
+									"console.log('URL:', pm.request.url.toString());",
+									"",
+									"// Log headers (exclude Authorization token for security)",
+									"const headers = pm.request.headers.toObject();",
+									"if (headers.Authorization) {",
+									"    headers.Authorization = 'Bearer [HIDDEN]';",
+									"}",
+									"console.log('Headers:', JSON.stringify(headers, null, 2));",
+									"",
+									"// Log request body if exists",
+									"if (pm.request.body && pm.request.body.mode === 'raw') {",
+									"    try {",
+									"        const body = JSON.parse(pm.request.body.raw);",
+									"        if (body.password) body.password = '[HIDDEN]';",
+									"        if (body.refreshToken) body.refreshToken = '[HIDDEN]';",
+									"        console.log('Body:', JSON.stringify(body, null, 2));",
+									"    } catch (e) {",
+									"        console.log('Body:', pm.request.body.raw);",
+									"    }",
+									"} else if (pm.request.body && pm.request.body.mode === 'formdata') {",
+									"    console.log('Body: [FormData with file]');",
+									"}",
+									"",
+									"console.log('');",
+									"console.log('RESPONSE: RESPONSE:');",
+									"console.log('Status:', pm.response.code, pm.response.status);",
+									"",
+									"// Log response body",
+									"try {",
+									"    const responseData = pm.response.json();",
+									"    // Hide sensitive data",
+									"    if (responseData.accessToken) responseData.accessToken = responseData.accessToken.substring(0, 20) + '...[HIDDEN]';",
+									"    if (responseData.refreshToken) responseData.refreshToken = responseData.refreshToken.substring(0, 20) + '...[HIDDEN]';",
+									"    console.log('Response Body:', JSON.stringify(responseData, null, 2));",
+									"} catch (e) {",
+									"    const text = pm.response.text();",
+									"    if (text.length > 200) {",
+									"        console.log('Response Body: [Binary or large content,', text.length, 'bytes]');",
+									"    } else {",
+									"        console.log('Response Body:', text);",
+									"    }",
+									"}",
+									"console.log('-'.repeat(60));",
+									"console.log('');",
+									"",
+									"pm.test('Status code is 200', () => {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"const jsonData = pm.response.json();",
+									"",
+									"pm.test('Response confirms deletion', () => {",
+									"    pm.expect(jsonData.message).to.include('deleted');",
+									"});",
+									"",
+									"console.log(' File deleted successfully');"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/file/delete/{{fileId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"file",
+								"delete",
+								"{{fileId}}"
+							]
+						},
+						"description": "Delete file by ID"
+					},
+					"response": []
+				},
+				{
+					"name": "7. Verify File Deleted",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"console.log('');",
+									"console.log('-'.repeat(60));",
+									"console.log('REQUEST: REQUEST:', pm.info.requestName);",
+									"console.log('-'.repeat(60));",
+									"console.log('Method:', pm.request.method);",
+									"console.log('URL:', pm.request.url.toString());",
+									"",
+									"// Log headers (exclude Authorization token for security)",
+									"const headers = pm.request.headers.toObject();",
+									"if (headers.Authorization) {",
+									"    headers.Authorization = 'Bearer [HIDDEN]';",
+									"}",
+									"console.log('Headers:', JSON.stringify(headers, null, 2));",
+									"",
+									"// Log request body if exists",
+									"if (pm.request.body && pm.request.body.mode === 'raw') {",
+									"    try {",
+									"        const body = JSON.parse(pm.request.body.raw);",
+									"        if (body.password) body.password = '[HIDDEN]';",
+									"        if (body.refreshToken) body.refreshToken = '[HIDDEN]';",
+									"        console.log('Body:', JSON.stringify(body, null, 2));",
+									"    } catch (e) {",
+									"        console.log('Body:', pm.request.body.raw);",
+									"    }",
+									"} else if (pm.request.body && pm.request.body.mode === 'formdata') {",
+									"    console.log('Body: [FormData with file]');",
+									"}",
+									"",
+									"console.log('');",
+									"console.log('RESPONSE: RESPONSE:');",
+									"console.log('Status:', pm.response.code, pm.response.status);",
+									"",
+									"// Log response body",
+									"try {",
+									"    const responseData = pm.response.json();",
+									"    // Hide sensitive data",
+									"    if (responseData.accessToken) responseData.accessToken = responseData.accessToken.substring(0, 20) + '...[HIDDEN]';",
+									"    if (responseData.refreshToken) responseData.refreshToken = responseData.refreshToken.substring(0, 20) + '...[HIDDEN]';",
+									"    console.log('Response Body:', JSON.stringify(responseData, null, 2));",
+									"} catch (e) {",
+									"    const text = pm.response.text();",
+									"    if (text.length > 200) {",
+									"        console.log('Response Body: [Binary or large content,', text.length, 'bytes]');",
+									"    } else {",
+									"        console.log('Response Body:', text);",
+									"    }",
+									"}",
+									"console.log('-'.repeat(60));",
+									"console.log('');",
+									"",
+									"pm.test('Status code is 404', () => {",
+									"    pm.response.to.have.status(404);",
+									"});",
+									"",
+									"const jsonData = pm.response.json();",
+									"",
+									"pm.test('Error message indicates file not found', () => {",
+									"    pm.expect(jsonData.error).to.exist;",
+									"});",
+									"",
+									"console.log(' Verified file is deleted');"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/file/{{fileId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"file",
+								"{{fileId}}"
+							]
+						},
+						"description": "Verify file no longer exists"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "4. Multi-Device Sessions",
+			"item": [
+				{
+					"name": "1. Device 1 - Login",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"console.log('');",
+									"console.log('-'.repeat(60));",
+									"console.log('REQUEST: REQUEST:', pm.info.requestName);",
+									"console.log('-'.repeat(60));",
+									"console.log('Method:', pm.request.method);",
+									"console.log('URL:', pm.request.url.toString());",
+									"",
+									"// Log headers (exclude Authorization token for security)",
+									"const headers = pm.request.headers.toObject();",
+									"if (headers.Authorization) {",
+									"    headers.Authorization = 'Bearer [HIDDEN]';",
+									"}",
+									"console.log('Headers:', JSON.stringify(headers, null, 2));",
+									"",
+									"// Log request body if exists",
+									"if (pm.request.body && pm.request.body.mode === 'raw') {",
+									"    try {",
+									"        const body = JSON.parse(pm.request.body.raw);",
+									"        if (body.password) body.password = '[HIDDEN]';",
+									"        if (body.refreshToken) body.refreshToken = '[HIDDEN]';",
+									"        console.log('Body:', JSON.stringify(body, null, 2));",
+									"    } catch (e) {",
+									"        console.log('Body:', pm.request.body.raw);",
+									"    }",
+									"} else if (pm.request.body && pm.request.body.mode === 'formdata') {",
+									"    console.log('Body: [FormData with file]');",
+									"}",
+									"",
+									"console.log('');",
+									"console.log('RESPONSE: RESPONSE:');",
+									"console.log('Status:', pm.response.code, pm.response.status);",
+									"",
+									"// Log response body",
+									"try {",
+									"    const responseData = pm.response.json();",
+									"    // Hide sensitive data",
+									"    if (responseData.accessToken) responseData.accessToken = responseData.accessToken.substring(0, 20) + '...[HIDDEN]';",
+									"    if (responseData.refreshToken) responseData.refreshToken = responseData.refreshToken.substring(0, 20) + '...[HIDDEN]';",
+									"    console.log('Response Body:', JSON.stringify(responseData, null, 2));",
+									"} catch (e) {",
+									"    const text = pm.response.text();",
+									"    if (text.length > 200) {",
+									"        console.log('Response Body: [Binary or large content,', text.length, 'bytes]');",
+									"    } else {",
+									"        console.log('Response Body:', text);",
+									"    }",
+									"}",
+									"console.log('-'.repeat(60));",
+									"console.log('');",
+									"",
+									"pm.test('Status code is 200', () => {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"const jsonData = pm.response.json();",
+									"",
+									"pm.test('Device 1 received tokens', () => {",
+									"    pm.expect(jsonData.accessToken).to.be.a('string');",
+									"    pm.expect(jsonData.refreshToken).to.be.a('string');",
+									"});",
+									"",
+									"pm.environment.set('device1_token', jsonData.accessToken);",
+									"pm.environment.set('device1_refresh', jsonData.refreshToken);",
+									"",
+									"console.log(' Device 1 logged in');"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"id\": \"test@erp.aero\",\n  \"password\": \"SecurePass123\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/signin",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"signin"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "2. Device 2 - Login",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"console.log('');",
+									"console.log('-'.repeat(60));",
+									"console.log('REQUEST: REQUEST:', pm.info.requestName);",
+									"console.log('-'.repeat(60));",
+									"console.log('Method:', pm.request.method);",
+									"console.log('URL:', pm.request.url.toString());",
+									"",
+									"// Log headers (exclude Authorization token for security)",
+									"const headers = pm.request.headers.toObject();",
+									"if (headers.Authorization) {",
+									"    headers.Authorization = 'Bearer [HIDDEN]';",
+									"}",
+									"console.log('Headers:', JSON.stringify(headers, null, 2));",
+									"",
+									"// Log request body if exists",
+									"if (pm.request.body && pm.request.body.mode === 'raw') {",
+									"    try {",
+									"        const body = JSON.parse(pm.request.body.raw);",
+									"        if (body.password) body.password = '[HIDDEN]';",
+									"        if (body.refreshToken) body.refreshToken = '[HIDDEN]';",
+									"        console.log('Body:', JSON.stringify(body, null, 2));",
+									"    } catch (e) {",
+									"        console.log('Body:', pm.request.body.raw);",
+									"    }",
+									"} else if (pm.request.body && pm.request.body.mode === 'formdata') {",
+									"    console.log('Body: [FormData with file]');",
+									"}",
+									"",
+									"console.log('');",
+									"console.log('RESPONSE: RESPONSE:');",
+									"console.log('Status:', pm.response.code, pm.response.status);",
+									"",
+									"// Log response body",
+									"try {",
+									"    const responseData = pm.response.json();",
+									"    // Hide sensitive data",
+									"    if (responseData.accessToken) responseData.accessToken = responseData.accessToken.substring(0, 20) + '...[HIDDEN]';",
+									"    if (responseData.refreshToken) responseData.refreshToken = responseData.refreshToken.substring(0, 20) + '...[HIDDEN]';",
+									"    console.log('Response Body:', JSON.stringify(responseData, null, 2));",
+									"} catch (e) {",
+									"    const text = pm.response.text();",
+									"    if (text.length > 200) {",
+									"        console.log('Response Body: [Binary or large content,', text.length, 'bytes]');",
+									"    } else {",
+									"        console.log('Response Body:', text);",
+									"    }",
+									"}",
+									"console.log('-'.repeat(60));",
+									"console.log('');",
+									"",
+									"pm.test('Status code is 200', () => {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"const jsonData = pm.response.json();",
+									"",
+									"pm.test('Device 2 received tokens', () => {",
+									"    pm.expect(jsonData.accessToken).to.be.a('string');",
+									"    pm.expect(jsonData.refreshToken).to.be.a('string');",
+									"});",
+									"",
+									"pm.test('Device 2 token differs from Device 1', () => {",
+									"    pm.expect(jsonData.accessToken).to.not.eql(pm.environment.get('device1_token'));",
+									"});",
+									"",
+									"pm.environment.set('device2_token', jsonData.accessToken);",
+									"pm.environment.set('device2_refresh', jsonData.refreshToken);",
+									"",
+									"console.log(' Device 2 logged in');"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"id\": \"test@erp.aero\",\n  \"password\": \"SecurePass123\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/signin",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"signin"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "3. Device 1 - Verify Active",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"console.log('');",
+									"console.log('-'.repeat(60));",
+									"console.log('REQUEST: REQUEST:', pm.info.requestName);",
+									"console.log('-'.repeat(60));",
+									"console.log('Method:', pm.request.method);",
+									"console.log('URL:', pm.request.url.toString());",
+									"",
+									"// Log headers (exclude Authorization token for security)",
+									"const headers = pm.request.headers.toObject();",
+									"if (headers.Authorization) {",
+									"    headers.Authorization = 'Bearer [HIDDEN]';",
+									"}",
+									"console.log('Headers:', JSON.stringify(headers, null, 2));",
+									"",
+									"// Log request body if exists",
+									"if (pm.request.body && pm.request.body.mode === 'raw') {",
+									"    try {",
+									"        const body = JSON.parse(pm.request.body.raw);",
+									"        if (body.password) body.password = '[HIDDEN]';",
+									"        if (body.refreshToken) body.refreshToken = '[HIDDEN]';",
+									"        console.log('Body:', JSON.stringify(body, null, 2));",
+									"    } catch (e) {",
+									"        console.log('Body:', pm.request.body.raw);",
+									"    }",
+									"} else if (pm.request.body && pm.request.body.mode === 'formdata') {",
+									"    console.log('Body: [FormData with file]');",
+									"}",
+									"",
+									"console.log('');",
+									"console.log('RESPONSE: RESPONSE:');",
+									"console.log('Status:', pm.response.code, pm.response.status);",
+									"",
+									"// Log response body",
+									"try {",
+									"    const responseData = pm.response.json();",
+									"    // Hide sensitive data",
+									"    if (responseData.accessToken) responseData.accessToken = responseData.accessToken.substring(0, 20) + '...[HIDDEN]';",
+									"    if (responseData.refreshToken) responseData.refreshToken = responseData.refreshToken.substring(0, 20) + '...[HIDDEN]';",
+									"    console.log('Response Body:', JSON.stringify(responseData, null, 2));",
+									"} catch (e) {",
+									"    const text = pm.response.text();",
+									"    if (text.length > 200) {",
+									"        console.log('Response Body: [Binary or large content,', text.length, 'bytes]');",
+									"    } else {",
+									"        console.log('Response Body:', text);",
+									"    }",
+									"}",
+									"console.log('-'.repeat(60));",
+									"console.log('');",
+									"",
+									"pm.test('Status code is 200', () => {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"const jsonData = pm.response.json();",
+									"",
+									"pm.test('Device 1 can access user info', () => {",
+									"    pm.expect(jsonData.id).to.eql('test@erp.aero');",
+									"});",
+									"",
+									"console.log(' Device 1 session is active');"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{device1_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/info",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"info"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "4. Device 2 - Verify Active",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"console.log('');",
+									"console.log('-'.repeat(60));",
+									"console.log('REQUEST: REQUEST:', pm.info.requestName);",
+									"console.log('-'.repeat(60));",
+									"console.log('Method:', pm.request.method);",
+									"console.log('URL:', pm.request.url.toString());",
+									"",
+									"// Log headers (exclude Authorization token for security)",
+									"const headers = pm.request.headers.toObject();",
+									"if (headers.Authorization) {",
+									"    headers.Authorization = 'Bearer [HIDDEN]';",
+									"}",
+									"console.log('Headers:', JSON.stringify(headers, null, 2));",
+									"",
+									"// Log request body if exists",
+									"if (pm.request.body && pm.request.body.mode === 'raw') {",
+									"    try {",
+									"        const body = JSON.parse(pm.request.body.raw);",
+									"        if (body.password) body.password = '[HIDDEN]';",
+									"        if (body.refreshToken) body.refreshToken = '[HIDDEN]';",
+									"        console.log('Body:', JSON.stringify(body, null, 2));",
+									"    } catch (e) {",
+									"        console.log('Body:', pm.request.body.raw);",
+									"    }",
+									"} else if (pm.request.body && pm.request.body.mode === 'formdata') {",
+									"    console.log('Body: [FormData with file]');",
+									"}",
+									"",
+									"console.log('');",
+									"console.log('RESPONSE: RESPONSE:');",
+									"console.log('Status:', pm.response.code, pm.response.status);",
+									"",
+									"// Log response body",
+									"try {",
+									"    const responseData = pm.response.json();",
+									"    // Hide sensitive data",
+									"    if (responseData.accessToken) responseData.accessToken = responseData.accessToken.substring(0, 20) + '...[HIDDEN]';",
+									"    if (responseData.refreshToken) responseData.refreshToken = responseData.refreshToken.substring(0, 20) + '...[HIDDEN]';",
+									"    console.log('Response Body:', JSON.stringify(responseData, null, 2));",
+									"} catch (e) {",
+									"    const text = pm.response.text();",
+									"    if (text.length > 200) {",
+									"        console.log('Response Body: [Binary or large content,', text.length, 'bytes]');",
+									"    } else {",
+									"        console.log('Response Body:', text);",
+									"    }",
+									"}",
+									"console.log('-'.repeat(60));",
+									"console.log('');",
+									"",
+									"pm.test('Status code is 200', () => {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"const jsonData = pm.response.json();",
+									"",
+									"pm.test('Device 2 can access user info', () => {",
+									"    pm.expect(jsonData.id).to.eql('test@erp.aero');",
+									"});",
+									"",
+									"console.log(' Device 2 session is active');"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{device2_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/info",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"info"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "5. Device 1 - Logout",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"console.log('');",
+									"console.log('-'.repeat(60));",
+									"console.log('REQUEST: REQUEST:', pm.info.requestName);",
+									"console.log('-'.repeat(60));",
+									"console.log('Method:', pm.request.method);",
+									"console.log('URL:', pm.request.url.toString());",
+									"",
+									"// Log headers (exclude Authorization token for security)",
+									"const headers = pm.request.headers.toObject();",
+									"if (headers.Authorization) {",
+									"    headers.Authorization = 'Bearer [HIDDEN]';",
+									"}",
+									"console.log('Headers:', JSON.stringify(headers, null, 2));",
+									"",
+									"// Log request body if exists",
+									"if (pm.request.body && pm.request.body.mode === 'raw') {",
+									"    try {",
+									"        const body = JSON.parse(pm.request.body.raw);",
+									"        if (body.password) body.password = '[HIDDEN]';",
+									"        if (body.refreshToken) body.refreshToken = '[HIDDEN]';",
+									"        console.log('Body:', JSON.stringify(body, null, 2));",
+									"    } catch (e) {",
+									"        console.log('Body:', pm.request.body.raw);",
+									"    }",
+									"} else if (pm.request.body && pm.request.body.mode === 'formdata') {",
+									"    console.log('Body: [FormData with file]');",
+									"}",
+									"",
+									"console.log('');",
+									"console.log('RESPONSE: RESPONSE:');",
+									"console.log('Status:', pm.response.code, pm.response.status);",
+									"",
+									"// Log response body",
+									"try {",
+									"    const responseData = pm.response.json();",
+									"    // Hide sensitive data",
+									"    if (responseData.accessToken) responseData.accessToken = responseData.accessToken.substring(0, 20) + '...[HIDDEN]';",
+									"    if (responseData.refreshToken) responseData.refreshToken = responseData.refreshToken.substring(0, 20) + '...[HIDDEN]';",
+									"    console.log('Response Body:', JSON.stringify(responseData, null, 2));",
+									"} catch (e) {",
+									"    const text = pm.response.text();",
+									"    if (text.length > 200) {",
+									"        console.log('Response Body: [Binary or large content,', text.length, 'bytes]');",
+									"    } else {",
+									"        console.log('Response Body:', text);",
+									"    }",
+									"}",
+									"console.log('-'.repeat(60));",
+									"console.log('');",
+									"",
+									"pm.test('Status code is 200', () => {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"const jsonData = pm.response.json();",
+									"",
+									"pm.test('Logout message received', () => {",
+									"    pm.expect(jsonData.message).to.exist;",
+									"});",
+									"",
+									"console.log(' Device 1 logged out');"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{device1_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/logout",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"logout"
+							]
+						},
+						"description": "Logout Device 1 only"
+					},
+					"response": []
+				},
+				{
+					"name": "6. Device 1 - Verify Logged Out",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"console.log('');",
+									"console.log('-'.repeat(60));",
+									"console.log('REQUEST: REQUEST:', pm.info.requestName);",
+									"console.log('-'.repeat(60));",
+									"console.log('Method:', pm.request.method);",
+									"console.log('URL:', pm.request.url.toString());",
+									"",
+									"// Log headers (exclude Authorization token for security)",
+									"const headers = pm.request.headers.toObject();",
+									"if (headers.Authorization) {",
+									"    headers.Authorization = 'Bearer [HIDDEN]';",
+									"}",
+									"console.log('Headers:', JSON.stringify(headers, null, 2));",
+									"",
+									"// Log request body if exists",
+									"if (pm.request.body && pm.request.body.mode === 'raw') {",
+									"    try {",
+									"        const body = JSON.parse(pm.request.body.raw);",
+									"        if (body.password) body.password = '[HIDDEN]';",
+									"        if (body.refreshToken) body.refreshToken = '[HIDDEN]';",
+									"        console.log('Body:', JSON.stringify(body, null, 2));",
+									"    } catch (e) {",
+									"        console.log('Body:', pm.request.body.raw);",
+									"    }",
+									"} else if (pm.request.body && pm.request.body.mode === 'formdata') {",
+									"    console.log('Body: [FormData with file]');",
+									"}",
+									"",
+									"console.log('');",
+									"console.log('RESPONSE: RESPONSE:');",
+									"console.log('Status:', pm.response.code, pm.response.status);",
+									"",
+									"// Log response body",
+									"try {",
+									"    const responseData = pm.response.json();",
+									"    // Hide sensitive data",
+									"    if (responseData.accessToken) responseData.accessToken = responseData.accessToken.substring(0, 20) + '...[HIDDEN]';",
+									"    if (responseData.refreshToken) responseData.refreshToken = responseData.refreshToken.substring(0, 20) + '...[HIDDEN]';",
+									"    console.log('Response Body:', JSON.stringify(responseData, null, 2));",
+									"} catch (e) {",
+									"    const text = pm.response.text();",
+									"    if (text.length > 200) {",
+									"        console.log('Response Body: [Binary or large content,', text.length, 'bytes]');",
+									"    } else {",
+									"        console.log('Response Body:', text);",
+									"    }",
+									"}",
+									"console.log('-'.repeat(60));",
+									"console.log('');",
+									"",
+									"pm.test('Status code is 401', () => {",
+									"    pm.response.to.have.status(401);",
+									"});",
+									"",
+									"const jsonData = pm.response.json();",
+									"",
+									"pm.test('Unauthorized error received', () => {",
+									"    pm.expect(jsonData.error).to.exist;",
+									"});",
+									"",
+									"console.log(' Device 1 session is terminated');"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{device1_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/info",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"info"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "7. Device 2 - Still Active",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"console.log('');",
+									"console.log('-'.repeat(60));",
+									"console.log('REQUEST: REQUEST:', pm.info.requestName);",
+									"console.log('-'.repeat(60));",
+									"console.log('Method:', pm.request.method);",
+									"console.log('URL:', pm.request.url.toString());",
+									"",
+									"// Log headers (exclude Authorization token for security)",
+									"const headers = pm.request.headers.toObject();",
+									"if (headers.Authorization) {",
+									"    headers.Authorization = 'Bearer [HIDDEN]';",
+									"}",
+									"console.log('Headers:', JSON.stringify(headers, null, 2));",
+									"",
+									"// Log request body if exists",
+									"if (pm.request.body && pm.request.body.mode === 'raw') {",
+									"    try {",
+									"        const body = JSON.parse(pm.request.body.raw);",
+									"        if (body.password) body.password = '[HIDDEN]';",
+									"        if (body.refreshToken) body.refreshToken = '[HIDDEN]';",
+									"        console.log('Body:', JSON.stringify(body, null, 2));",
+									"    } catch (e) {",
+									"        console.log('Body:', pm.request.body.raw);",
+									"    }",
+									"} else if (pm.request.body && pm.request.body.mode === 'formdata') {",
+									"    console.log('Body: [FormData with file]');",
+									"}",
+									"",
+									"console.log('');",
+									"console.log('RESPONSE: RESPONSE:');",
+									"console.log('Status:', pm.response.code, pm.response.status);",
+									"",
+									"// Log response body",
+									"try {",
+									"    const responseData = pm.response.json();",
+									"    // Hide sensitive data",
+									"    if (responseData.accessToken) responseData.accessToken = responseData.accessToken.substring(0, 20) + '...[HIDDEN]';",
+									"    if (responseData.refreshToken) responseData.refreshToken = responseData.refreshToken.substring(0, 20) + '...[HIDDEN]';",
+									"    console.log('Response Body:', JSON.stringify(responseData, null, 2));",
+									"} catch (e) {",
+									"    const text = pm.response.text();",
+									"    if (text.length > 200) {",
+									"        console.log('Response Body: [Binary or large content,', text.length, 'bytes]');",
+									"    } else {",
+									"        console.log('Response Body:', text);",
+									"    }",
+									"}",
+									"console.log('-'.repeat(60));",
+									"console.log('');",
+									"",
+									"pm.test('Status code is 200', () => {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"const jsonData = pm.response.json();",
+									"",
+									"pm.test('Device 2 still has access', () => {",
+									"    pm.expect(jsonData.id).to.eql('test@erp.aero');",
+									"});",
+									"",
+									"console.log(' Device 2 session is still active (independent sessions working)');"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{device2_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/info",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"info"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "8. Device 2 - Logout",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"console.log('');",
+									"console.log('-'.repeat(60));",
+									"console.log('REQUEST: REQUEST:', pm.info.requestName);",
+									"console.log('-'.repeat(60));",
+									"console.log('Method:', pm.request.method);",
+									"console.log('URL:', pm.request.url.toString());",
+									"",
+									"// Log headers (exclude Authorization token for security)",
+									"const headers = pm.request.headers.toObject();",
+									"if (headers.Authorization) {",
+									"    headers.Authorization = 'Bearer [HIDDEN]';",
+									"}",
+									"console.log('Headers:', JSON.stringify(headers, null, 2));",
+									"",
+									"// Log request body if exists",
+									"if (pm.request.body && pm.request.body.mode === 'raw') {",
+									"    try {",
+									"        const body = JSON.parse(pm.request.body.raw);",
+									"        if (body.password) body.password = '[HIDDEN]';",
+									"        if (body.refreshToken) body.refreshToken = '[HIDDEN]';",
+									"        console.log('Body:', JSON.stringify(body, null, 2));",
+									"    } catch (e) {",
+									"        console.log('Body:', pm.request.body.raw);",
+									"    }",
+									"} else if (pm.request.body && pm.request.body.mode === 'formdata') {",
+									"    console.log('Body: [FormData with file]');",
+									"}",
+									"",
+									"console.log('');",
+									"console.log('RESPONSE: RESPONSE:');",
+									"console.log('Status:', pm.response.code, pm.response.status);",
+									"",
+									"// Log response body",
+									"try {",
+									"    const responseData = pm.response.json();",
+									"    // Hide sensitive data",
+									"    if (responseData.accessToken) responseData.accessToken = responseData.accessToken.substring(0, 20) + '...[HIDDEN]';",
+									"    if (responseData.refreshToken) responseData.refreshToken = responseData.refreshToken.substring(0, 20) + '...[HIDDEN]';",
+									"    console.log('Response Body:', JSON.stringify(responseData, null, 2));",
+									"} catch (e) {",
+									"    const text = pm.response.text();",
+									"    if (text.length > 200) {",
+									"        console.log('Response Body: [Binary or large content,', text.length, 'bytes]');",
+									"    } else {",
+									"        console.log('Response Body:', text);",
+									"    }",
+									"}",
+									"console.log('-'.repeat(60));",
+									"console.log('');",
+									"",
+									"pm.test('Status code is 200', () => {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"console.log(' Device 2 logged out, cleanup complete');"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{device2_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/logout",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"logout"
+							]
+						},
+						"description": "Cleanup - logout Device 2"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "5. Error Cases & Validation",
+			"item": [
+				{
+					"name": "1. Login with Wrong Password",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"console.log('');",
+									"console.log('-'.repeat(60));",
+									"console.log('REQUEST: REQUEST:', pm.info.requestName);",
+									"console.log('-'.repeat(60));",
+									"console.log('Method:', pm.request.method);",
+									"console.log('URL:', pm.request.url.toString());",
+									"",
+									"// Log headers (exclude Authorization token for security)",
+									"const headers = pm.request.headers.toObject();",
+									"if (headers.Authorization) {",
+									"    headers.Authorization = 'Bearer [HIDDEN]';",
+									"}",
+									"console.log('Headers:', JSON.stringify(headers, null, 2));",
+									"",
+									"// Log request body if exists",
+									"if (pm.request.body && pm.request.body.mode === 'raw') {",
+									"    try {",
+									"        const body = JSON.parse(pm.request.body.raw);",
+									"        if (body.password) body.password = '[HIDDEN]';",
+									"        if (body.refreshToken) body.refreshToken = '[HIDDEN]';",
+									"        console.log('Body:', JSON.stringify(body, null, 2));",
+									"    } catch (e) {",
+									"        console.log('Body:', pm.request.body.raw);",
+									"    }",
+									"} else if (pm.request.body && pm.request.body.mode === 'formdata') {",
+									"    console.log('Body: [FormData with file]');",
+									"}",
+									"",
+									"console.log('');",
+									"console.log('RESPONSE: RESPONSE:');",
+									"console.log('Status:', pm.response.code, pm.response.status);",
+									"",
+									"// Log response body",
+									"try {",
+									"    const responseData = pm.response.json();",
+									"    // Hide sensitive data",
+									"    if (responseData.accessToken) responseData.accessToken = responseData.accessToken.substring(0, 20) + '...[HIDDEN]';",
+									"    if (responseData.refreshToken) responseData.refreshToken = responseData.refreshToken.substring(0, 20) + '...[HIDDEN]';",
+									"    console.log('Response Body:', JSON.stringify(responseData, null, 2));",
+									"} catch (e) {",
+									"    const text = pm.response.text();",
+									"    if (text.length > 200) {",
+									"        console.log('Response Body: [Binary or large content,', text.length, 'bytes]');",
+									"    } else {",
+									"        console.log('Response Body:', text);",
+									"    }",
+									"}",
+									"console.log('-'.repeat(60));",
+									"console.log('');",
+									"",
+									"pm.test('Status code is 401', () => {",
+									"    pm.response.to.have.status(401);",
+									"});",
+									"",
+									"const jsonData = pm.response.json();",
+									"",
+									"pm.test('Error message received', () => {",
+									"    pm.expect(jsonData.error).to.exist;",
+									"});",
+									"",
+									"console.log(' Invalid credentials correctly rejected');"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"id\": \"test@erp.aero\",\n  \"password\": \"WrongPassword\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/signin",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"signin"
+							]
+						},
+						"description": "Test authentication with wrong password"
+					},
+					"response": []
+				},
+				{
+					"name": "2. Access Without Token",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"console.log('');",
+									"console.log('-'.repeat(60));",
+									"console.log('REQUEST: REQUEST:', pm.info.requestName);",
+									"console.log('-'.repeat(60));",
+									"console.log('Method:', pm.request.method);",
+									"console.log('URL:', pm.request.url.toString());",
+									"",
+									"// Log headers (exclude Authorization token for security)",
+									"const headers = pm.request.headers.toObject();",
+									"if (headers.Authorization) {",
+									"    headers.Authorization = 'Bearer [HIDDEN]';",
+									"}",
+									"console.log('Headers:', JSON.stringify(headers, null, 2));",
+									"",
+									"// Log request body if exists",
+									"if (pm.request.body && pm.request.body.mode === 'raw') {",
+									"    try {",
+									"        const body = JSON.parse(pm.request.body.raw);",
+									"        if (body.password) body.password = '[HIDDEN]';",
+									"        if (body.refreshToken) body.refreshToken = '[HIDDEN]';",
+									"        console.log('Body:', JSON.stringify(body, null, 2));",
+									"    } catch (e) {",
+									"        console.log('Body:', pm.request.body.raw);",
+									"    }",
+									"} else if (pm.request.body && pm.request.body.mode === 'formdata') {",
+									"    console.log('Body: [FormData with file]');",
+									"}",
+									"",
+									"console.log('');",
+									"console.log('RESPONSE: RESPONSE:');",
+									"console.log('Status:', pm.response.code, pm.response.status);",
+									"",
+									"// Log response body",
+									"try {",
+									"    const responseData = pm.response.json();",
+									"    // Hide sensitive data",
+									"    if (responseData.accessToken) responseData.accessToken = responseData.accessToken.substring(0, 20) + '...[HIDDEN]';",
+									"    if (responseData.refreshToken) responseData.refreshToken = responseData.refreshToken.substring(0, 20) + '...[HIDDEN]';",
+									"    console.log('Response Body:', JSON.stringify(responseData, null, 2));",
+									"} catch (e) {",
+									"    const text = pm.response.text();",
+									"    if (text.length > 200) {",
+									"        console.log('Response Body: [Binary or large content,', text.length, 'bytes]');",
+									"    } else {",
+									"        console.log('Response Body:', text);",
+									"    }",
+									"}",
+									"console.log('-'.repeat(60));",
+									"console.log('');",
+									"",
+									"pm.test('Status code is 401', () => {",
+									"    pm.response.to.have.status(401);",
+									"});",
+									"",
+									"const jsonData = pm.response.json();",
+									"",
+									"pm.test('Unauthorized error received', () => {",
+									"    pm.expect(jsonData.error).to.exist;",
+									"});",
+									"",
+									"console.log(' Missing token correctly rejected');"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/info",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"info"
+							]
+						},
+						"description": "Test access to protected endpoint without token"
+					},
+					"response": []
+				},
+				{
+					"name": "3. Access With Invalid Token",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"console.log('');",
+									"console.log('-'.repeat(60));",
+									"console.log('REQUEST: REQUEST:', pm.info.requestName);",
+									"console.log('-'.repeat(60));",
+									"console.log('Method:', pm.request.method);",
+									"console.log('URL:', pm.request.url.toString());",
+									"",
+									"// Log headers (exclude Authorization token for security)",
+									"const headers = pm.request.headers.toObject();",
+									"if (headers.Authorization) {",
+									"    headers.Authorization = 'Bearer [HIDDEN]';",
+									"}",
+									"console.log('Headers:', JSON.stringify(headers, null, 2));",
+									"",
+									"// Log request body if exists",
+									"if (pm.request.body && pm.request.body.mode === 'raw') {",
+									"    try {",
+									"        const body = JSON.parse(pm.request.body.raw);",
+									"        if (body.password) body.password = '[HIDDEN]';",
+									"        if (body.refreshToken) body.refreshToken = '[HIDDEN]';",
+									"        console.log('Body:', JSON.stringify(body, null, 2));",
+									"    } catch (e) {",
+									"        console.log('Body:', pm.request.body.raw);",
+									"    }",
+									"} else if (pm.request.body && pm.request.body.mode === 'formdata') {",
+									"    console.log('Body: [FormData with file]');",
+									"}",
+									"",
+									"console.log('');",
+									"console.log('RESPONSE: RESPONSE:');",
+									"console.log('Status:', pm.response.code, pm.response.status);",
+									"",
+									"// Log response body",
+									"try {",
+									"    const responseData = pm.response.json();",
+									"    // Hide sensitive data",
+									"    if (responseData.accessToken) responseData.accessToken = responseData.accessToken.substring(0, 20) + '...[HIDDEN]';",
+									"    if (responseData.refreshToken) responseData.refreshToken = responseData.refreshToken.substring(0, 20) + '...[HIDDEN]';",
+									"    console.log('Response Body:', JSON.stringify(responseData, null, 2));",
+									"} catch (e) {",
+									"    const text = pm.response.text();",
+									"    if (text.length > 200) {",
+									"        console.log('Response Body: [Binary or large content,', text.length, 'bytes]');",
+									"    } else {",
+									"        console.log('Response Body:', text);",
+									"    }",
+									"}",
+									"console.log('-'.repeat(60));",
+									"console.log('');",
+									"",
+									"pm.test('Status code is 401', () => {",
+									"    pm.response.to.have.status(401);",
+									"});",
+									"",
+									"const jsonData = pm.response.json();",
+									"",
+									"pm.test('Invalid token error received', () => {",
+									"    pm.expect(jsonData.error).to.exist;",
+									"});",
+									"",
+									"console.log(' Invalid token correctly rejected');"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer invalid_token_here"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/info",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"info"
+							]
+						},
+						"description": "Test access with malformed token"
+					},
+					"response": []
+				},
+				{
+					"name": "4. Upload Without File",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"console.log('');",
+									"console.log('-'.repeat(60));",
+									"console.log('REQUEST: REQUEST:', pm.info.requestName);",
+									"console.log('-'.repeat(60));",
+									"console.log('Method:', pm.request.method);",
+									"console.log('URL:', pm.request.url.toString());",
+									"",
+									"// Log headers (exclude Authorization token for security)",
+									"const headers = pm.request.headers.toObject();",
+									"if (headers.Authorization) {",
+									"    headers.Authorization = 'Bearer [HIDDEN]';",
+									"}",
+									"console.log('Headers:', JSON.stringify(headers, null, 2));",
+									"",
+									"// Log request body if exists",
+									"if (pm.request.body && pm.request.body.mode === 'raw') {",
+									"    try {",
+									"        const body = JSON.parse(pm.request.body.raw);",
+									"        if (body.password) body.password = '[HIDDEN]';",
+									"        if (body.refreshToken) body.refreshToken = '[HIDDEN]';",
+									"        console.log('Body:', JSON.stringify(body, null, 2));",
+									"    } catch (e) {",
+									"        console.log('Body:', pm.request.body.raw);",
+									"    }",
+									"} else if (pm.request.body && pm.request.body.mode === 'formdata') {",
+									"    console.log('Body: [FormData with file]');",
+									"}",
+									"",
+									"console.log('');",
+									"console.log('RESPONSE: RESPONSE:');",
+									"console.log('Status:', pm.response.code, pm.response.status);",
+									"",
+									"// Log response body",
+									"try {",
+									"    const responseData = pm.response.json();",
+									"    // Hide sensitive data",
+									"    if (responseData.accessToken) responseData.accessToken = responseData.accessToken.substring(0, 20) + '...[HIDDEN]';",
+									"    if (responseData.refreshToken) responseData.refreshToken = responseData.refreshToken.substring(0, 20) + '...[HIDDEN]';",
+									"    console.log('Response Body:', JSON.stringify(responseData, null, 2));",
+									"} catch (e) {",
+									"    const text = pm.response.text();",
+									"    if (text.length > 200) {",
+									"        console.log('Response Body: [Binary or large content,', text.length, 'bytes]');",
+									"    } else {",
+									"        console.log('Response Body:', text);",
+									"    }",
+									"}",
+									"console.log('-'.repeat(60));",
+									"console.log('');",
+									"",
+									"pm.test('Status code is 400', () => {",
+									"    pm.response.to.have.status(400);",
+									"});",
+									"",
+									"const jsonData = pm.response.json();",
+									"",
+									"pm.test('Validation error received', () => {",
+									"    pm.expect(jsonData.error).to.exist;",
+									"});",
+									"",
+									"console.log(' Missing file correctly rejected');"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": []
+						},
+						"url": {
+							"raw": "{{baseUrl}}/file/upload",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"file",
+								"upload"
+							]
+						},
+						"description": "Test upload without file"
+					},
+					"response": []
+				},
+				{
+					"name": "5. Get Non-Existent File",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"console.log('');",
+									"console.log('-'.repeat(60));",
+									"console.log('REQUEST: REQUEST:', pm.info.requestName);",
+									"console.log('-'.repeat(60));",
+									"console.log('Method:', pm.request.method);",
+									"console.log('URL:', pm.request.url.toString());",
+									"",
+									"// Log headers (exclude Authorization token for security)",
+									"const headers = pm.request.headers.toObject();",
+									"if (headers.Authorization) {",
+									"    headers.Authorization = 'Bearer [HIDDEN]';",
+									"}",
+									"console.log('Headers:', JSON.stringify(headers, null, 2));",
+									"",
+									"// Log request body if exists",
+									"if (pm.request.body && pm.request.body.mode === 'raw') {",
+									"    try {",
+									"        const body = JSON.parse(pm.request.body.raw);",
+									"        if (body.password) body.password = '[HIDDEN]';",
+									"        if (body.refreshToken) body.refreshToken = '[HIDDEN]';",
+									"        console.log('Body:', JSON.stringify(body, null, 2));",
+									"    } catch (e) {",
+									"        console.log('Body:', pm.request.body.raw);",
+									"    }",
+									"} else if (pm.request.body && pm.request.body.mode === 'formdata') {",
+									"    console.log('Body: [FormData with file]');",
+									"}",
+									"",
+									"console.log('');",
+									"console.log('RESPONSE: RESPONSE:');",
+									"console.log('Status:', pm.response.code, pm.response.status);",
+									"",
+									"// Log response body",
+									"try {",
+									"    const responseData = pm.response.json();",
+									"    // Hide sensitive data",
+									"    if (responseData.accessToken) responseData.accessToken = responseData.accessToken.substring(0, 20) + '...[HIDDEN]';",
+									"    if (responseData.refreshToken) responseData.refreshToken = responseData.refreshToken.substring(0, 20) + '...[HIDDEN]';",
+									"    console.log('Response Body:', JSON.stringify(responseData, null, 2));",
+									"} catch (e) {",
+									"    const text = pm.response.text();",
+									"    if (text.length > 200) {",
+									"        console.log('Response Body: [Binary or large content,', text.length, 'bytes]');",
+									"    } else {",
+									"        console.log('Response Body:', text);",
+									"    }",
+									"}",
+									"console.log('-'.repeat(60));",
+									"console.log('');",
+									"",
+									"pm.test('Status code is 404', () => {",
+									"    pm.response.to.have.status(404);",
+									"});",
+									"",
+									"const jsonData = pm.response.json();",
+									"",
+									"pm.test('Not found error received', () => {",
+									"    pm.expect(jsonData.error).to.exist;",
+									"});",
+									"",
+									"console.log(' Non-existent file correctly handled');"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/file/999999",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"file",
+								"999999"
+							]
+						},
+						"description": "Test getting file that doesn't exist"
+					},
+					"response": []
+				},
+				{
+					"name": "6. Register with Existing Email",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"console.log('');",
+									"console.log('-'.repeat(60));",
+									"console.log('REQUEST: REQUEST:', pm.info.requestName);",
+									"console.log('-'.repeat(60));",
+									"console.log('Method:', pm.request.method);",
+									"console.log('URL:', pm.request.url.toString());",
+									"",
+									"// Log headers (exclude Authorization token for security)",
+									"const headers = pm.request.headers.toObject();",
+									"if (headers.Authorization) {",
+									"    headers.Authorization = 'Bearer [HIDDEN]';",
+									"}",
+									"console.log('Headers:', JSON.stringify(headers, null, 2));",
+									"",
+									"// Log request body if exists",
+									"if (pm.request.body && pm.request.body.mode === 'raw') {",
+									"    try {",
+									"        const body = JSON.parse(pm.request.body.raw);",
+									"        if (body.password) body.password = '[HIDDEN]';",
+									"        if (body.refreshToken) body.refreshToken = '[HIDDEN]';",
+									"        console.log('Body:', JSON.stringify(body, null, 2));",
+									"    } catch (e) {",
+									"        console.log('Body:', pm.request.body.raw);",
+									"    }",
+									"} else if (pm.request.body && pm.request.body.mode === 'formdata') {",
+									"    console.log('Body: [FormData with file]');",
+									"}",
+									"",
+									"console.log('');",
+									"console.log('RESPONSE: RESPONSE:');",
+									"console.log('Status:', pm.response.code, pm.response.status);",
+									"",
+									"// Log response body",
+									"try {",
+									"    const responseData = pm.response.json();",
+									"    // Hide sensitive data",
+									"    if (responseData.accessToken) responseData.accessToken = responseData.accessToken.substring(0, 20) + '...[HIDDEN]';",
+									"    if (responseData.refreshToken) responseData.refreshToken = responseData.refreshToken.substring(0, 20) + '...[HIDDEN]';",
+									"    console.log('Response Body:', JSON.stringify(responseData, null, 2));",
+									"} catch (e) {",
+									"    const text = pm.response.text();",
+									"    if (text.length > 200) {",
+									"        console.log('Response Body: [Binary or large content,', text.length, 'bytes]');",
+									"    } else {",
+									"        console.log('Response Body:', text);",
+									"    }",
+									"}",
+									"console.log('-'.repeat(60));",
+									"console.log('');",
+									"",
+									"pm.test('Status code is 409', () => {",
+									"    pm.response.to.have.status(409);",
+									"});",
+									"",
+									"const jsonData = pm.response.json();",
+									"",
+									"pm.test('Conflict error received', () => {",
+									"    pm.expect(jsonData.error).to.exist;",
+									"});",
+									"",
+									"console.log(' Duplicate registration correctly rejected');"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"id\": \"test@erp.aero\",\n  \"password\": \"AnotherPass123\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/signup",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"signup"
+							]
+						},
+						"description": "Test registration with existing email"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "6. Cleanup & Final Logout",
+			"item": [
+				{
+					"name": "Final Logout",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"console.log('');",
+									"console.log('-'.repeat(60));",
+									"console.log('REQUEST: REQUEST:', pm.info.requestName);",
+									"console.log('-'.repeat(60));",
+									"console.log('Method:', pm.request.method);",
+									"console.log('URL:', pm.request.url.toString());",
+									"",
+									"// Log headers (exclude Authorization token for security)",
+									"const headers = pm.request.headers.toObject();",
+									"if (headers.Authorization) {",
+									"    headers.Authorization = 'Bearer [HIDDEN]';",
+									"}",
+									"console.log('Headers:', JSON.stringify(headers, null, 2));",
+									"",
+									"// Log request body if exists",
+									"if (pm.request.body && pm.request.body.mode === 'raw') {",
+									"    try {",
+									"        const body = JSON.parse(pm.request.body.raw);",
+									"        if (body.password) body.password = '[HIDDEN]';",
+									"        if (body.refreshToken) body.refreshToken = '[HIDDEN]';",
+									"        console.log('Body:', JSON.stringify(body, null, 2));",
+									"    } catch (e) {",
+									"        console.log('Body:', pm.request.body.raw);",
+									"    }",
+									"} else if (pm.request.body && pm.request.body.mode === 'formdata') {",
+									"    console.log('Body: [FormData with file]');",
+									"}",
+									"",
+									"console.log('');",
+									"console.log('RESPONSE: RESPONSE:');",
+									"console.log('Status:', pm.response.code, pm.response.status);",
+									"",
+									"// Log response body",
+									"try {",
+									"    const responseData = pm.response.json();",
+									"    // Hide sensitive data",
+									"    if (responseData.accessToken) responseData.accessToken = responseData.accessToken.substring(0, 20) + '...[HIDDEN]';",
+									"    if (responseData.refreshToken) responseData.refreshToken = responseData.refreshToken.substring(0, 20) + '...[HIDDEN]';",
+									"    console.log('Response Body:', JSON.stringify(responseData, null, 2));",
+									"} catch (e) {",
+									"    const text = pm.response.text();",
+									"    if (text.length > 200) {",
+									"        console.log('Response Body: [Binary or large content,', text.length, 'bytes]');",
+									"    } else {",
+									"        console.log('Response Body:', text);",
+									"    }",
+									"}",
+									"console.log('-'.repeat(60));",
+									"console.log('');",
+									"",
+									"pm.test('Status code is 200', () => {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"console.log(' All tests completed successfully');",
+									"console.log(' Session cleanup complete');"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/logout",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"logout"
+							]
+						},
+						"description": "Final cleanup - logout main session"
+					},
+					"response": []
+				}
+			]
+		}
+	],
+	"variable": [
+		{
+			"key": "baseUrl",
+			"value": "http://localhost:3333",
+			"type": "string"
+		}
+	]
+}

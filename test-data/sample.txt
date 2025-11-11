@@ -1,0 +1,2 @@
+This is a sample test file for ERP.AERO API testing.
+It contains some text content to verify file upload functionality.
